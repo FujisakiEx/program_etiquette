@@ -1,44 +1,29 @@
+#ifndef _H_FUJISAKI_MYHASH
+#define _H_FUJISAKI_MYHASH
+
 #include <string>
+#include<iostream>
+#include<vector>
+#include<set>
 
+namespace myhash{
 
-struct Nameval {
-    std::string name;
-    int value;
-    Nameval* next;
-};
+struct Nameval;
 
-constexpr uint32_t HASH_COUNT = 1e6+7;
-constexpr uint32_t MULTIPLIER = 31;
+constexpr uint32_t HASH_COUNT = 1000;
+constexpr uint32_t MULTIPLIER = 37;
+constexpr float ALLOW_AVERAGE_LIST_LENGTH = 4.0;
+constexpr uint32_t REMAKE_HASH_SIZE = 2;
 
-uint32_t hash(std::string str){
-    uint32_t h = 0;
-    for(uint32_t i = 0; i < str.length(); ++i){
-        h = MULTIPLIER * h + str[i];
-    }
+uint32_t hash(std::string str);
 
-    return h % HASH_COUNT;
-}
+// for debug
+void init_hash_table();
+void printNameval(const Nameval* nameval);
+Nameval* lookup(std::string name, bool create,  int value);
+bool check_average_bucketsize();
+void recreate_hash_table();
+void printAll();
+} // myhash
 
-Nameval *symtab[HASH_COUNT];
-
-Nameval* lookup(std::string name, bool create,  int value){
-    uint32_t h;
-    Nameval* sym;
-
-    h = hash(name);
-
-    for(sym = symtab[h]; sym != nullptr; sym = sym->next){
-        if (name == sym->name){
-            return sym;
-        }
-    }
-
-    if(create){
-        sym = new Nameval();
-        sym->name = name;
-        sym->value = value;
-        sym->next = symtab[h];
-        symtab[h] =sym;
-    }
-    return sym;
-}
+#endif //_H_FUJISAKI_MYHASH
