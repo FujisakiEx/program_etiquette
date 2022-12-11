@@ -2,12 +2,6 @@
 
 namespace myhash{
 
-struct Nameval {
-    std::string name;
-    int value;
-    Nameval* next;
-};
-
 uint32_t recreate_table_count = 1;
 
 std::vector<std::string> keyList(0);
@@ -17,20 +11,26 @@ Nameval **symtab = nullptr;
 uint32_t hash(std::string str){
     uint32_t h = 0;
     for(uint32_t i = 0; i < str.length(); ++i){
-        h = MULTIPLIER * h + str[i];
+        h = HASH_MULTIPLIER * h + str[i];
     }
 
-    return h % HASH_COUNT;
+    return h % (HASH_COUNT * recreate_table_count);
 }
 
 
 // for debug
-void printNameval(const Nameval* nameval){
+void print_nameval(const Nameval* nameval){
     std::cout << nameval->name << " " << nameval->value << " " << nameval->next << std::endl;
 }
 
 void init_hash_table(){
-    symtab = new Nameval*[HASH_COUNT * recreate_table_count];
+    keyList.clear();
+    hashSet.clear();
+    uint32_t size = HASH_COUNT * recreate_table_count * ALLOW_AVERAGE_LIST_LENGTH;
+    symtab = new Nameval*[size];
+    for(uint32_t i = 0; i < size; ++i){
+        symtab[i] = nullptr;
+    }
 }
 
 Nameval* lookup(std::string name, bool create,  int value){
@@ -91,6 +91,8 @@ void recreate_hash_table(){
             auto next = sym->next;
             delete sym;
             sym = next;
+            if(sym == nullptr)
+                break;
         }
     }
 
@@ -103,15 +105,19 @@ void recreate_hash_table(){
     }
 }
 
-void printAll(){
+void print_all(){
     Nameval* sym;
 
     for(const auto& name : keyList){
         uint32_t h = hash(name);
 
         for(sym = symtab[h]; sym != nullptr; sym = sym->next){
-            printNameval(sym);
+            print_nameval(sym);
         }
     }
+}
+
+uint32_t get_recreate_count(){
+    return recreate_table_count;
 }
 } // myhash
