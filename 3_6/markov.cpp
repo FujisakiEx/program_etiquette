@@ -4,6 +4,17 @@ namespace mymarkov{
 
 std::map<Prefix, std::vector<std::string>> stateTab;
 
+constexpr uint32_t HASH_COUNT = 1000;
+constexpr uint32_t HASH_MULTIPLIER = 37;
+uint32_t hash(std::string str){
+    uint32_t h = 0;
+    for(uint32_t i = 0; i < str.length(); ++i){
+        h = HASH_MULTIPLIER * h + str[i];
+    }
+
+    return h % HASH_COUNT;
+}
+
 void reset(){
     stateTab.clear();
 }
@@ -20,7 +31,11 @@ void add(Prefix& prefix, const std::string& s){
         stateTab[prefix].push_back(s);
         prefix.pop_front();
     }
+#ifdef problem_3_2
+    prefix.push_back(hash(s));
+#else
     prefix.push_back(s);
+#endif
 }
 
 void generate(uint32_t number_of_words){
@@ -36,7 +51,11 @@ void generate(uint32_t number_of_words){
         
         std::cout << w << "\n";
         prefix.pop_front();
+#ifdef problem_3_2
+        prefix.push_back(hash(w));
+#else
         prefix.push_back(w);
+#endif
     }
     std::cout << std::endl;
 }

@@ -10,6 +10,9 @@
 
 using namespace mymarkov;
 
+class MARKOV_TEST: public ::testing::TestWithParam<const char*>{
+};
+
 TEST(MARKOV_TEST, add){
     Prefix prefix;
     reset();
@@ -41,25 +44,23 @@ TEST(MARKOV_TEST, build){
     build(prefix, is0);
 #ifdef problem_3_2
     EXPECT_EQ(prefix.front(), hash("pitch"));
-#else
-    EXPECT_EQ(prefix.front(), "pitch");
-#endif
     prefix.pop_front();
-#ifdef problem_3_2
     EXPECT_EQ(prefix.front(), hash("sine"));
 #else
     EXPECT_EQ(prefix.front(), "sine");
+    prefix.pop_front();
+    EXPECT_EQ(prefix.front(), "pitch");
 #endif
     prefix.pop_front();
 
     EXPECT_EQ(prefix.size(), 0);
 }
 
-TEST(MARKOV_TEST, generate){
+TEST_P(MARKOV_TEST, generate){
     uint32_t nwords = 20;
     Prefix prefix;
     reset();
-    std::ifstream is0("test_case0.txt");
+    std::ifstream is0(GetParam());
 
     for(uint32_t i = 0; i < NUMBER_OF_PREFIX; ++i){
         add(prefix, NONWORD);
@@ -71,6 +72,8 @@ TEST(MARKOV_TEST, generate){
     
     EXPECT_EQ(prefix.size(), NUMBER_OF_PREFIX);
 }
+
+INSTANTIATE_TEST_SUITE_P(INPUT_TEST, MARKOV_TEST, ::testing::Values("test_case0.txt", "test_case1.txt"));
 
 TEST(MARKOV_TEST, define){
 #ifdef problem_3_2
