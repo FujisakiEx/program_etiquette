@@ -18,9 +18,18 @@ uint32_t hash(std::string str){
 void reset(){
     stateTab.clear();
 }
+#ifdef problem_3_3
+std::string firstWord = NONWORD;
+#endif
 
 void build(Prefix& prefix, std::istream& in){
     std::string buf;
+#ifdef problem_3_3
+    in >> firstWord;
+    for(uint32_t i = 0; i < NUMBER_OF_PREFIX; ++i){
+        add(prefix, firstWord);
+    }
+#endif
     while(in >> buf){
         add(prefix, buf);
     }
@@ -33,6 +42,8 @@ void add(Prefix& prefix, const std::string& s){
     }
 #ifdef problem_3_2
     prefix.push_back(hash(s));
+#elif defined(problem_3_3)
+    prefix.push_back(hash(s));
 #else
     prefix.push_back(s);
 #endif
@@ -41,8 +52,15 @@ void add(Prefix& prefix, const std::string& s){
 void generate(uint32_t number_of_words){
     Prefix prefix;
     for(uint32_t i = 0; i < NUMBER_OF_PREFIX; ++i){
+#ifdef problem_3_3
+        add(prefix, firstWord);
+#else
         add(prefix, NONWORD);
+#endif
     }
+#ifdef problem_3_3
+    std::cout << firstWord << "\n";
+#endif
     for(uint32_t i = 0; i < number_of_words; ++i){
         std::vector<std::string>& suf = stateTab[prefix];
         const std::string& w = suf[rand() % suf.size()];
@@ -52,6 +70,8 @@ void generate(uint32_t number_of_words){
         std::cout << w << "\n";
         prefix.pop_front();
 #ifdef problem_3_2
+        prefix.push_back(hash(w));
+#elif defined(problem_3_3)
         prefix.push_back(hash(w));
 #else
         prefix.push_back(w);

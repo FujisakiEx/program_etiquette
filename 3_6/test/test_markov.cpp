@@ -26,6 +26,8 @@ TEST(MARKOV_TEST, add){
     for(uint32_t i = 0; i < NUMBER_OF_PREFIX; ++i){
 #ifdef problem_3_2
         EXPECT_EQ(prefix.front(), hash(NONWORD));
+#elif defined(problem_3_3)
+        EXPECT_EQ(prefix.front(), hash(NONWORD));
 #else
         EXPECT_EQ(prefix.front(), NONWORD);
 #endif
@@ -43,6 +45,10 @@ TEST(MARKOV_TEST, build){
 
     build(prefix, is0);
 #ifdef problem_3_2
+    EXPECT_EQ(prefix.front(), hash("pitch"));
+    prefix.pop_front();
+    EXPECT_EQ(prefix.front(), hash("sine"));
+#elif defined(problem_3_3)
     EXPECT_EQ(prefix.front(), hash("pitch"));
     prefix.pop_front();
     EXPECT_EQ(prefix.front(), hash("sine"));
@@ -78,6 +84,8 @@ INSTANTIATE_TEST_SUITE_P(INPUT_TEST, MARKOV_TEST, ::testing::Values("test_case0.
 TEST(MARKOV_TEST, define){
 #ifdef problem_3_2
     std::cout << "ver 3_2" << std::endl;
+#elif defined(problem_3_3)
+    std::cout << "ver 3_3" << std::endl;
 #else
     std::cout << "ver default" << std::endl;
 #endif

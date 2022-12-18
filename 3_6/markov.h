@@ -9,9 +9,11 @@
 
 namespace mymarkov{
 
-#define problem_3_2
+#define problem_3_3
 
 #ifdef problem_3_2
+using Prefix = std::deque<uint32_t>;
+#elif defined(problem_3_3)
 using Prefix = std::deque<uint32_t>;
 #else
 using Prefix = std::deque<std::string>;
