@@ -4,6 +4,10 @@ namespace mymarkov{
 
 std::map<Prefix, std::vector<std::string>> stateTab;
 
+void reset(){
+    stateTab.clear();
+}
+
 void build(Prefix& prefix, std::istream& in){
     std::string buf;
     while(in >> buf){
