@@ -27,6 +27,16 @@ TEST_P(CSV_TEST, basic){
     }
 }
 
+TEST(CSV_TEST, iterator){
+    std::ifstream ifs("test_case1.csv");
+    CsvReader csvReader(ifs, ",");
+    std::string line;
+    for(uint32_t i = 0; const auto& it : csvReader){
+        EXPECT_EQ(it, inputs[i]);
+        ++i;
+    }
+}
+
 TEST(CSV_TEST, case_commma){
     std::ifstream ifs("test_case1.csv");
     CsvReader csvReader(ifs, ",");

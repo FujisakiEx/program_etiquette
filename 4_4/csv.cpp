@@ -107,4 +107,53 @@ namespace mycsv{
         return getField(i);
     }
 
+    bool CsvReader::operator==(const CsvReader& other) const{
+        if (n_field != other.n_field) return false;
+        return field == other.field;
+    }
+
+    CsvReaderIterator CsvReader::begin(){
+        return CsvReaderIterator(this, 0);
+    }
+
+    CsvReaderIterator CsvReader::end(){
+        return CsvReaderIterator();
+    }
+
+    CsvReaderIterator::CsvReaderIterator(){
+        _csvReader = nullptr;
+        _index = CsvReader::MAX_FIELD_SIZE;
+    }
+
+    CsvReaderIterator::CsvReaderIterator(CsvReader* csvReader, uint32_t index){
+        _csvReader = csvReader;
+        _index = (index < CsvReader::MAX_FIELD_SIZE ? index : CsvReader::MAX_FIELD_SIZE);
+    }
+
+    std::string CsvReaderIterator::operator*() const {
+        return (_index != CsvReader::MAX_FIELD_SIZE ? (*_csvReader)[_index] : "");
+    }
+
+    CsvReaderIterator& CsvReaderIterator::operator++(){
+        _index++;
+        if(_index > _csvReader->n_field){
+            _index = CsvReader::MAX_FIELD_SIZE;
+        }
+        return *this;
+    }
+
+    CsvReaderIterator CsvReaderIterator::operator++(int){
+        auto result = *this;
+        _index++;
+        if(_index > _csvReader->n_field){
+            _index = CsvReader::MAX_FIELD_SIZE;
+        }
+        return result;
+    }
+
+    bool CsvReaderIterator::operator==(const CsvReaderIterator& it) const {
+        return this->_index != it._index || this->_csvReader != it._csvReader;
+    }
+
+
 } // namespace mycsv
