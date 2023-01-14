@@ -12,17 +12,19 @@ struct Traits {};
 
 template<>
 struct Traits<char>{
+    std::string fileName = "char";
     std::string inputString = "hello,  world\n";
 };
 
 template<>
 struct Traits<uint32_t>{
-    //std::string inputString = "0\n1\n1\n16\n30\n40\n50\n";
-    std::string inputString = "1";
+    std::string fileName = "u32";
+    std::string inputString = "0\n1\n1\n16\n30\n40\n50\n";
 };
 
 template<>
 struct Traits<double>{
+    std::string fileName = "double";
     std::string inputString = "0.0 1.0 1.0 16.0 30.3 40.4 50.5\n";
 };
 
@@ -65,15 +67,19 @@ TEST(FREQ_TEST, BasicUInt){
     Freq<uint32_t> freq;
 
     EXPECT_EQ(freq.get_count(0), 0);
-    std::string input_string = "0\n10\n20\n";
+    std::string input_string = "0 1 1 16 30 40 50\n";
     FILE* input_file = freopen("input.txt", "w", stdin);
     std::fwrite(input_string.c_str(), sizeof(char), input_string.size(), input_file);
     std::fflush(input_file);
     std::freopen("input.txt", "r", stdin);
 
+    EXPECT_EQ(0, freq.get_count(1));
     freq.freq();
-
-    EXPECT_EQ(freq.get_count(0), 1);
+    EXPECT_EQ(2, freq.get_count(1));
+    EXPECT_EQ(1, freq.get_count(16));
+    freq.reset();
+    EXPECT_EQ(0, freq.get_count(1));
+    EXPECT_EQ(0, freq.get_count(16));
     std::fclose(input_file);
 }
 
@@ -117,13 +123,20 @@ TYPED_TEST_P(FREQ_TEST, Input){
 
     Traits<TypeParam> t;
 
-    std::cout << t.inputString.c_str() << " " << t.inputString.size() << std::endl;
+    std::cin.clear();
+    while (std::cin.fail())
+    {
+        std::cin.ignore();
+    }
 
-    FILE* input_file = freopen("input.txt", "w", stdin);
+    FILE* input_file = freopen(t.fileName.c_str(), "w", stdin);
     std::fwrite(t.inputString.c_str(), sizeof(char), t.inputString.size(), input_file);
     std::fflush(input_file);
-    std::freopen("input.txt", "r", stdin);
+    std::fclose(input_file);
+    std::freopen(t.fileName.c_str(), "r", stdin);
 
+    EXPECT_FALSE(std::cin.eof());
+    EXPECT_FALSE(std::cin.fail());
     EXPECT_EQ(0, freq.get_count(TypeParam(1)));
     freq.freq();
     EXPECT_EQ(2, freq.get_count(TypeParam(1)));
@@ -132,10 +145,9 @@ TYPED_TEST_P(FREQ_TEST, Input){
     EXPECT_EQ(0, freq.get_count(TypeParam(1)));
     EXPECT_EQ(0, freq.get_count(TypeParam(16)));
 
-    std::fclose(input_file);
 }
 
 REGISTER_TYPED_TEST_CASE_P(FREQ_TEST, Basic, Input);
 
-using MyTypes = ::testing::Types<double, char, uint32_t> ;
+using MyTypes = ::testing::Types<uint32_t, double, char> ;
 INSTANTIATE_TYPED_TEST_CASE_P(My, FREQ_TEST, MyTypes);
